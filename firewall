@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# INSTALLATION
+#   $ sudo cp firewall /etc/init.d/
+#   $ sudo ln /etc/init.d/firewall /etc/rc5.d/S20firewall
+
+# Flush all rules from iptables
+iptables -P INPUT ACCEPT
+iptables -F
+
+# Accept all traffic from the loopback interface
+iptables -A INPUT -i lo -j ACCEPT
+
+# Accept established and related packets
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow SSH and HTTP/HTTPS
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Block all other incoming traffic
+iptables -P INPUT DROP
+
+# Don't forward any traffic
+iptables -P FORWARD DROP
+
+# Allow all outgoing traffic
+iptables -P OUTPUT ACCEPT
+
+# List rules to confirm
+iptables -L -v
+
